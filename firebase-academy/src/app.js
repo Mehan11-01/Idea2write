@@ -438,9 +438,11 @@ function sProfile(){
     <div class="panel"><h3>Collector’s items <span class="label">${(p.trophies||[]).length} of ${TROPHIES.length}</span></h3>
       <div class="chips" style="align-items:center">${(p.trophies||[]).length?(p.trophies||[]).map(id=>{const t=TROPHIES.find(x=>x.id===id);return t?`<span title="${esc(t.name)}">${trophyArt(t,52)}</span>`:""}).join(""):`<span class="mute">No items yet.</span>`}
       <button class="btn" data-act="go" data-s="vault" style="margin-left:auto">Open the Trophy Vault →</button></div></div>
-    <div class="panel" id="my-writing" tabindex="-1"><h3>My writing & teacher feedback</h3>${p.history.length?`<div class="log">${p.history.slice().reverse().map(x=>{return `<details><summary>${parse(x.date).toLocaleDateString("en-GB",{day:"numeric",month:"short"})} · ${esc(x.title||x.quest)} · ${Number.isFinite(+x.words)?+x.words:words(String(x.text||""))} words · <span class="stat-${x.status}">${{submitted:"Waiting for teacher",returned:"Please improve",approved:"In the Library",reviewed:"Checked by teacher"}[x.status]||""}</span><span class="stars">${[1,2,3,4,5].map(i=>starIcon(i<=x.stars,16)).join("")}</span></summary><p class="parch">${esc(x.text)}</p>${(()=>{const sub=S.subs.find(z=>z.id===x.id);return sub?correctionsPanel(sub,false)+versionHistory(sub)+(x.status==="returned"?`<button class="plaque ember small" data-act="revise" data-id="${sub.id}">Improve my writing →</button>`:""):""})()}</details>`}).join("")}</div>`:`<p class="mute">Your finished writing will be kept here.</p>`}</div>
+    <button class="plaque" data-act="mywriting">Open my writing & feedback →</button>
   </section>`;
 }
+
+function sFeedback(){const p=P();return `<section class="stage profile"><div class="headrow"><div><p class="kicker">My writing journey · Year ${p.year}</p><h1>My writing & feedback</h1><p>Read your writing, teacher’s corrections and feedback.</p></div><button class="btn ghost" data-act="go" data-s="hall">← Courtyard</button></div>    <div class="panel" id="my-writing" tabindex="-1"><h3>My writing & teacher feedback</h3>${p.history.length?`<div class="log">${p.history.slice().reverse().map(x=>{return `<details><summary>${parse(x.date).toLocaleDateString("en-GB",{day:"numeric",month:"short"})} · ${esc(x.title||x.quest)} · ${Number.isFinite(+x.words)?+x.words:words(String(x.text||""))} words · <span class="stat-${x.status}">${{submitted:"Waiting for teacher",returned:"Please improve",approved:"In the Library",reviewed:"Checked by teacher"}[x.status]||""}</span><span class="stars">${[1,2,3,4,5].map(i=>starIcon(i<=x.stars,16)).join("")}</span></summary><p class="parch">${esc(x.text)}</p>${(()=>{const sub=S.subs.find(z=>z.id===x.id);return sub?correctionsPanel(sub,false)+versionHistory(sub)+(x.status==="returned"?`<button class="plaque ember small" data-act="revise" data-id="${sub.id}">Improve my writing →</button>`:""):""})()}</details>`}).join("")}</div>`:`<p class="mute">Your finished writing will be kept here.</p>`}</div></section>`;}
 
 /* ---------- calendar ---------- */
 function sCalendar(){
@@ -554,12 +556,12 @@ function modalHTML(){
 }
 
 /* ================= render ================= */
-const SCREENS={classes:sClasses,help:sHelp,pending:sPending,dev:sDev,boot:()=>`<div class="libempty" style="min-height:60vh"><span class="spin big"></span><p>Opening the Academy…</p></div>`,setup:sSetup,auth:sAuth,tauth:sTAuth,year:sYear,library:sLibrary,fame:sFame,vault:sVault,title:sTitle,create:sCreate,house:sHouse,support:sSupport,hall:sHall,quest:sQuest,reward:sReward,profile:sProfile,calendar:sCalendar,office:sOffice};
+const SCREENS={classes:sClasses,help:sHelp,pending:sPending,dev:sDev,boot:()=>`<div class="libempty" style="min-height:60vh"><span class="spin big"></span><p>Opening the Academy…</p></div>`,setup:sSetup,auth:sAuth,tauth:sTAuth,year:sYear,library:sLibrary,fame:sFame,vault:sVault,title:sTitle,create:sCreate,house:sHouse,support:sSupport,hall:sHall,quest:sQuest,reward:sReward,profile:sProfile,feedback:sFeedback,calendar:sCalendar,office:sOffice};
 const NOHUD=new Set(["pending","boot","setup","title","auth","tauth","year","create","house","support"]);
 function render(){
   document.documentElement.dataset.motion=DB.motion?"on":"off";
   const p=S.role==="pupil"?P():null;if(p){const h=HOUSES[p.house];document.documentElement.style.setProperty("--hdark",h.dark);document.documentElement.style.setProperty("--hc",h.col)}
-  const rk=V.screen==="quest"&&W()?({think:"library",org:"chamber",write:"quill"}[W().step]):({hall:"courtyard",reward:"vault",vault:"vault",calendar:"observatory",profile:"quill",library:"library",fame:"vault",office:"library"}[V.screen]||null);
+  const rk=V.screen==="quest"&&W()?({think:"library",org:"chamber",write:"quill"}[W().step]):({hall:"courtyard",reward:"vault",vault:"vault",calendar:"observatory",profile:"quill",feedback:"quill",library:"library",fame:"vault",office:"library"}[V.screen]||null);
   setWorld(rk||"castle");document.body.dataset.screen=V.screen;$("#world").classList.toggle("dim",!["title","hall"].includes(V.screen)&&!rk);$("#world").classList.toggle("room",!!rk&&V.screen!=="hall");
   const fid=document.activeElement&&document.activeElement.id;
   $("#top").innerHTML=V.screen==="dev"?dHud():V.screen==="office"?oHud():NOHUD.has(V.screen)||!p?"":hud();
@@ -574,7 +576,7 @@ function render(){
   if(T.fx){T.fx=false;const c=document.querySelector("#chest .chest");setTimeout(()=>{c&&c.classList.add("open");sparkle()},DB.motion?350:0);sfx("complete",{delay:.3});const n=T.last?T.last.stars:0;for(let i=1;i<=n;i++)setTimeout(()=>sfx("star"),500+i*150+(DB.motion?150:0));if(T.last&&T.last.newT&&T.last.newT.length)setTimeout(()=>sfx("trophy"),1800)}
   else{const c=document.querySelector("#chest .chest");c&&c.classList.add("open")}
 }
-const PUPIL_SCREENS=["classes","hall","quest","reward","profile","calendar","vault","library","fame","year","create","house","support"];
+const PUPIL_SCREENS=["classes","hall","quest","reward","profile","feedback","calendar","vault","library","fame","year","create","house","support"];
 async function go(s){
   try{speechSynthesis.cancel()}catch(e){}
   if(PUPIL_SCREENS.includes(s)&&S.role!=="pupil")s="title";
@@ -583,7 +585,7 @@ async function go(s){
   if(s==="dev"&&!S.admin)s="title";
   if((s==="library"||s==="fame")&&S.role==="pupil"){try{await busy(s==="library"?"Opening the library…":"Counting the stars…",refreshClassmates)}catch(e){return}}
   if(["hall","profile","vault"].includes(s)&&P()){const nw=refreshTrophies(P());if(nw.length){save();setTimeout(()=>{const t=TROPHIES.find(x=>x.id===nw[0]);toast(`New badge: ${t.name}!`,trophyArt(t,30));sfx("trophy",{auto:true})},300)}}
-  if(["hall","profile","vault","calendar"].includes(s))refreshMine();
+  if(["hall","profile","feedback","vault","calendar"].includes(s))refreshMine();
   V.screen=s;T.enter=true;T.err="";T.editing=T.detailing=T.confirmDel=T.selCard=null;T.clearConfirm=false;
   if(S.role==="pupil"&&S.prof&&S.prof.setup)save();
   render();window.scrollTo({top:0,behavior:DB.motion?"smooth":"auto"});
