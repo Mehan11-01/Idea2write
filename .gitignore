@@ -1,0 +1,5 @@
+.env
+node_modules/
+
+# Generated regression bundle
+firebase-academy/test/supabase-api.bundle.cjs

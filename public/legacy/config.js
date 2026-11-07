@@ -1,0 +1,1 @@
+window.IDEA2WRITE_CONFIG = { supabaseUrl: "https://cgugqrfhjpjvqxjsmzwj.supabase.co", supabaseAnonKey: "sb_publishable_f7lnyb73yZonYnDnlzzBdg_OhTRCad5", siteUrl: "https://idea2write-writing-academy.g-ipgp22214049.chatgpt.site/" };

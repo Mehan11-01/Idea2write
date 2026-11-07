@@ -1,0 +1,55 @@
+const {initializeTestEnvironment,assertSucceeds,assertFails}=require('@firebase/rules-unit-testing');
+const {doc,setDoc,getDoc,getDocs,collection,query,where,updateDoc,writeBatch}=require('firebase/firestore');
+const fs=require('fs');let passed=0;
+const ok=async(name,p)=>{await assertSucceeds(p);passed++;console.log('PASS',name)};
+const no=async(name,p)=>{await assertFails(p);passed++;console.log('PASS denies',name)};
+(async()=>{const env=await initializeTestEnvironment({projectId:'demo-idea2write',firestore:{rules:fs.readFileSync('firestore.rules','utf8'),host:'127.0.0.1',port:8080}});
+try{await env.clearFirestore();await env.withSecurityRulesDisabled(async c=>{const db=c.firestore();for(const [path,data] of Object.entries({
+ 'users/p1':{role:'pupil',name:'Star',classId:'c1',code:'K7M2QX'},'users/p2':{role:'pupil',name:'Moon',classId:'c1',code:'K7M2QX'},'users/t1':{role:'teacher',name:'Teacher',status:'approved'},'users/t2':{role:'teacher',name:'Other',status:'approved'},'users/dev':{role:'teacher',name:'Developer',status:'approved'},'admins/dev':{role:'admin'},
+ 'classes/c1':{name:'Class One',teacherUid:'t1',code:'K7M2QX',closed:false},'classes/c2':{name:'Class Two',teacherUid:'t2',code:'ABCD23',closed:false},'classes/closed':{name:'Closed',teacherUid:'t2',code:'CLOSED',closed:true},'codes/K7M2QX':{classId:'c1'},'codes/ABCD23':{classId:'c2'},'codes/CLOSED':{classId:'closed'},'classes/c1/members/p1':{uid:'p1',name:'Star',stars:0,spent:0},'classes/c1/members/p2':{uid:'p2',name:'Moon',stars:0,spent:0},
+ 'classes/c1/work/p1__quest':{uid:'p1',qid:'quest',text:'My original draft',support:'lantern'},'users/p1/notifications/n1':{title:'Feedback',readAt:0}
+ }))await setDoc(doc(db,path),data)});
+const p=env.authenticatedContext('p1').firestore(),other=env.authenticatedContext('p2').firestore(),t=env.authenticatedContext('t1').firestore(),dev=env.authenticatedContext('dev').firestore(),anon=env.unauthenticatedContext().firestore();
+const request=(uid,name,role)=>{const now=Date.now();return {ownerUid:uid,ownerName:name,ownerRole:role,subject:'Help me',category:'Writing activity',status:'pending',createdAt:now,updatedAt:now,lastUserMessageAt:now,userReadAt:now,adminReadAt:0,lastReplyAt:0}};
+await ok('pupil creates private enquiry',setDoc(doc(p,'supportRequests/r1'),request('p1','Star','pupil')));
+await ok('teacher creates private enquiry',setDoc(doc(t,'supportRequests/r2'),request('t1','Teacher','teacher')));
+await no('anonymous creates enquiry',setDoc(doc(anon,'supportRequests/r3'),request('p1','Star','pupil')));
+await no('pupil spoofs owner',setDoc(doc(p,'supportRequests/spoof'),request('p2','Moon','pupil')));
+await no('pupil spoofs role',setDoc(doc(p,'supportRequests/spoofrole'),request('p1','Star','teacher')));
+await ok('owner lists own enquiries',getDocs(query(collection(p,'supportRequests'),where('ownerUid','==','p1'))));
+await no('pupil lists all enquiries',getDocs(collection(p,'supportRequests')));
+await no('other pupil reads enquiry',getDoc(doc(other,'supportRequests/r1')));
+await no('class teacher reads pupil enquiry',getDoc(doc(t,'supportRequests/r1')));
+await ok('developer lists enquiries',getDocs(collection(dev,'supportRequests')));
+await ok('pupil posts message',setDoc(doc(p,'supportRequests/r1/messages/m1'),{senderUid:'p1',senderRole:'owner',text:'I need help.',createdAt:Date.now()}));
+await no('other pupil posts to thread',setDoc(doc(other,'supportRequests/r1/messages/attack'),{senderUid:'p2',senderRole:'owner',text:'No',createdAt:Date.now()}));
+await no('pupil impersonates developer',setDoc(doc(p,'supportRequests/r1/messages/attack'),{senderUid:'p1',senderRole:'developer',text:'No',createdAt:Date.now()}));
+await ok('developer replies to pupil',setDoc(doc(dev,'supportRequests/r1/messages/m2'),{senderUid:'dev',senderRole:'developer',text:'Here is help.',createdAt:Date.now()}));
+await ok('developer replies to teacher',setDoc(doc(dev,'supportRequests/r2/messages/m2'),{senderUid:'dev',senderRole:'developer',text:'Here is help.',createdAt:Date.now()}));
+await ok('owner reads reply',getDocs(collection(p,'supportRequests/r1/messages')));
+await no('other pupil reads messages',getDocs(collection(other,'supportRequests/r1/messages')));
+await no('owner edits old message',updateDoc(doc(p,'supportRequests/r1/messages/m1'),{text:'edited'}));
+await ok('developer resolves',updateDoc(doc(dev,'supportRequests/r1'),{status:'resolved',lastReplyAt:Date.now()}));
+await ok('owner marks resolved reply read',updateDoc(doc(p,'supportRequests/r1'),{userReadAt:Date.now()}));
+await no('pupil resolves another enquiry',updateDoc(doc(p,'supportRequests/r2'),{status:'resolved'}));
+await no('owner rewrites identity',updateDoc(doc(p,'supportRequests/r1'),{ownerUid:'p2'}));
+await no('spoof future timestamp',updateDoc(doc(p,'supportRequests/r1'),{userReadAt:Date.now()+99999999}));
+await ok('read own notification',getDoc(doc(p,'users/p1/notifications/n1')));
+await no('read someone else notification',getDoc(doc(other,'users/p1/notifications/n1')));
+await ok('mark notification read',updateDoc(doc(p,'users/p1/notifications/n1'),{readAt:Date.now()}));
+await no('forge notification',setDoc(doc(p,'users/p1/notifications/fake'),{title:'Fake'}));
+await ok('existing pupil draft survives',getDoc(doc(p,'classes/c1/work/p1__quest')));
+await no('another pupil reads draft',getDoc(doc(other,'classes/c1/work/p1__quest')));
+await ok('teacher sees own class draft',getDoc(doc(t,'classes/c1/work/p1__quest')));
+await no('self-approve teacher',updateDoc(doc(t,'users/t1'),{status:'approved',role:'developer'}));
+await no('join new class without code',setDoc(doc(p,'classes/c2/members/p1'),{uid:'p1',name:'Star',stars:0,spent:0,joinCode:'WRONG1'}));
+const b=writeBatch(p);b.set(doc(p,'classes/c2/members/p1'),{uid:'p1',name:'Star',stars:0,spent:0,joinCode:'ABCD23'});b.set(doc(p,'users/p1/classes/c2'),{classId:'c2',code:'ABCD23',joinedAt:Date.now()});b.update(doc(p,'users/p1'),{lastClassId:'c2'});await ok('atomic durable membership and active class',b.commit());
+await ok('joined pupil opens new class',getDoc(doc(p,'classes/c2')));
+await ok('old class still accessible',getDoc(doc(p,'classes/c1')));
+await ok('membership saved under account',getDoc(doc(p,'users/p1/classes/c2')));
+await no('join closed class',setDoc(doc(p,'classes/closed/members/p1'),{uid:'p1',name:'Star',stars:0,spent:0,joinCode:'CLOSED'}));
+await no('change original class ID',updateDoc(doc(p,'users/p1'),{classId:'c2'}));
+await no('change active class without membership',updateDoc(doc(other,'users/p2'),{lastClassId:'c2'}));
+const np=env.authenticatedContext('newp').firestore(),nb=writeBatch(np);nb.set(doc(np,'users/newp'),{role:'pupil',name:'New wizard',classId:'c1',lastClassId:'c1',code:'K7M2QX'});nb.set(doc(np,'classes/c1/members/newp'),{uid:'newp',name:'New wizard',stars:0,spent:0,joinCode:'K7M2QX'});nb.set(doc(np,'users/newp/classes/c1'),{classId:'c1',code:'K7M2QX',joinedAt:Date.now()});await ok('new pupil registers atomically',nb.commit());
+console.log(`PASS: ${passed} Firebase rule checks`);
+}finally{await env.cleanup()}})().catch(e=>{console.error(e);process.exit(1)});

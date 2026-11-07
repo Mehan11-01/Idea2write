@@ -1,0 +1,1 @@
+window.I2W_CONFIG={"apiKey": "supabase", "supabaseUrl": "https://cgugqrfhjpjvqxjsmzwj.supabase.co", "supabaseKey": "sb_publishable_f7lnyb73yZonYnDnlzzBdg_OhTRCad5", "supportEmail": "g-ipgp22214049@moe-dl.edu.my"};

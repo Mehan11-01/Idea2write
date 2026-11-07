@@ -1,0 +1,213 @@
+rules_version = '2';
+// Idea2Write security rules.
+// Pupils: see their own drafts and submissions, their classmates' public profiles (nickname, avatar, stars)
+//         and only TEACHER-APPROVED writing. Teachers: full access to classes they created, nothing else,
+//         and only after a developer has APPROVED their account (or they used the current invite code).
+// Developers (admins): listed in /admins/{uid}; that collection can only be edited in the Firebase console.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function me() { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data; }
+    function isAdmin() { return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+    function approvedTeacher() { return signedIn() && me().role == "teacher" && me().get("status", "") == "approved"; }
+    function isTeacherOf(cid) {
+      return signedIn() && get(/databases/$(database)/documents/classes/$(cid)).data.teacherUid == request.auth.uid
+        && me().get("status", "") == "approved";
+    }
+    function classOpen(cid) { return get(/databases/$(database)/documents/classes/$(cid)).data.get("closed", false) == false; }
+    function inviteCode() { return get(/databases/$(database)/documents/config/invite).data.get("code", ""); }
+    function isMemberOf(cid) {
+      return signedIn() && exists(/databases/$(database)/documents/classes/$(cid)/members/$(request.auth.uid));
+    }
+    function ownPupil() { return signedIn() && getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "pupil"; }
+    function validJoin(cid, code) { return code is string
+      && get(/databases/$(database)/documents/codes/$(code)).data.classId == cid
+      && get(/databases/$(database)/documents/classes/$(cid)).data.code == code && classOpen(cid); }
+    function nearNow(n) { return n is int && n <= request.time.toMillis() + 60000 && n >= request.time.toMillis() - 60000; }
+    function okText(s, max) { return s is string && s.size() <= max; }
+
+    match /users/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow create: if signedIn() && request.auth.uid == uid
+        && okText(request.resource.data.name, 40)
+        && ((request.resource.data.role == "teacher"
+              && (request.resource.data.status == "pending" && !("invite" in request.resource.data)
+                  || (request.resource.data.status == "approved"
+                      && exists(/databases/$(database)/documents/config/invite)
+                      && inviteCode() != ""
+                      && request.resource.data.invite == inviteCode())))
+            || (request.resource.data.role == "pupil" && !("status" in request.resource.data)
+                && exists(/databases/$(database)/documents/classes/$(request.resource.data.classId))
+                && validJoin(request.resource.data.classId, request.resource.data.code)));
+      // a user may edit their own profile but never their role, class or approval status;
+      // an admin may change only the approval status
+      allow update: if (signedIn() && request.auth.uid == uid
+          && request.resource.data.role == resource.data.role
+          && request.resource.data.get("classId", null) == resource.data.get("classId", null)
+          && request.resource.data.get("status", null) == resource.data.get("status", null)
+          && request.resource.data.get("invite", null) == resource.data.get("invite", null)
+          && (request.resource.data.get("lastClassId", null) == resource.data.get("lastClassId", null)
+              || existsAfter(/databases/$(database)/documents/classes/$(request.resource.data.lastClassId)/members/$(uid))))
+        || (isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status", "statusAt"])
+          && request.resource.data.status in ["pending", "approved", "rejected", "disabled"]);
+      allow delete: if false;
+    }
+
+
+    match /users/{uid}/classes/{cid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow create, update: if signedIn() && request.auth.uid == uid && ownPupil()
+        && request.resource.data.keys().hasOnly(["classId", "code", "joinedAt"])
+        && request.resource.data.classId == cid && validJoin(cid, request.resource.data.code)
+        && existsAfter(/databases/$(database)/documents/classes/$(cid)/members/$(uid));
+      allow delete: if false;
+    }
+    match /users/{uid}/notifications/{id} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["readAt"])
+        && nearNow(request.resource.data.readAt);
+      allow create, delete: if false; // generated only by trusted Cloud Functions
+    }
+    match /supportRequests/{rid} {
+      function ownRequest() { return signedIn() && resource.data.ownerUid == request.auth.uid; }
+      allow read: if ownRequest() || isAdmin();
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(["ownerUid","ownerName","ownerRole","subject","category","status","createdAt","updatedAt","lastUserMessageAt","userReadAt","adminReadAt","lastReplyAt"])
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerName == me().name
+        && request.resource.data.ownerRole == me().role
+        && request.resource.data.ownerRole in ["pupil","teacher"]
+        && request.resource.data.category in ["Account & login","Joining a class","Writing activity","Submission & feedback","Avatar & rewards","Other"]
+        && okText(request.resource.data.subject,120) && request.resource.data.subject.size() > 0
+        && request.resource.data.status == "pending"
+        && request.resource.data.adminReadAt == 0 && request.resource.data.lastReplyAt == 0
+        && nearNow(request.resource.data.createdAt) && nearNow(request.resource.data.updatedAt)
+        && nearNow(request.resource.data.lastUserMessageAt) && nearNow(request.resource.data.userReadAt);
+      allow update: if (ownRequest()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["userReadAt","lastUserMessageAt","updatedAt","status"])
+          && request.resource.data.status == "pending"
+          && nearNow(request.resource.data.userReadAt)
+          && (request.resource.data.lastUserMessageAt == resource.data.lastUserMessageAt || nearNow(request.resource.data.lastUserMessageAt)))
+        || (ownRequest() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["userReadAt"]) && nearNow(request.resource.data.userReadAt))
+        || (isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["status","updatedAt","adminReadAt","lastReplyAt"])
+          && request.resource.data.status in ["pending","resolved"]);
+      allow delete: if false;
+      match /messages/{mid} {
+        function parentRequest() { return getAfter(/databases/$(database)/documents/supportRequests/$(rid)).data; }
+        allow read: if signedIn() && (get(/databases/$(database)/documents/supportRequests/$(rid)).data.ownerUid == request.auth.uid || isAdmin());
+        allow create: if signedIn() && request.resource.data.keys().hasOnly(["senderUid","senderRole","text","createdAt"])
+          && request.resource.data.senderUid == request.auth.uid
+          && okText(request.resource.data.text,4000) && request.resource.data.text.size() > 0 && nearNow(request.resource.data.createdAt)
+          && ((parentRequest().ownerUid == request.auth.uid && request.resource.data.senderRole == "owner")
+              || (isAdmin() && request.resource.data.senderRole == "developer"));
+        allow update, delete: if false;
+      }
+    }
+
+    // Developer list: readable by the person themselves (so the app knows), editable only in the Firebase console.
+    match /admins/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow write: if false;
+    }
+    // Developer settings (the teacher invite code). Only admins can read or change it.
+    match /config/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    // Join codes: anyone may look up ONE code (needed before a pupil has an account); nobody may list them.
+    match /codes/{code} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if signedIn()
+        && getAfter(/databases/$(database)/documents/classes/$(request.resource.data.classId)).data.teacherUid == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    match /classes/{cid} {
+      allow read: if signedIn() && (resource.data.teacherUid == request.auth.uid || isMemberOf(cid) || isAdmin());
+      allow create: if approvedTeacher()
+        && request.resource.data.teacherUid == request.auth.uid
+        && request.resource.data.get("closed", false) == false
+        && okText(request.resource.data.name, 60);
+      allow update: if (approvedTeacher() && resource.data.teacherUid == request.auth.uid
+          && request.resource.data.teacherUid == resource.data.teacherUid
+          && request.resource.data.code == resource.data.code
+          && request.resource.data.get("closed", false) == resource.data.get("closed", false))
+        || (isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["closed"]));
+      allow delete: if false;
+
+      // Public pupil profile inside the class (nickname, avatar, house, stars). No real names or emails.
+      match /members/{uid} {
+        allow read: if isTeacherOf(cid) || isMemberOf(cid) || isAdmin();
+        allow create: if signedIn() && request.auth.uid == uid && classOpen(cid)
+          && ownPupil() && validJoin(cid, request.resource.data.joinCode)
+          && request.resource.data.uid == uid && request.resource.data.stars == 0 && request.resource.data.spent == 0;
+        allow update: if signedIn() && request.auth.uid == uid && isMemberOf(cid) && classOpen(cid)
+          && request.resource.data.uid == resource.data.uid
+          && request.resource.data.stars is int
+          && request.resource.data.stars >= resource.data.stars
+          && request.resource.data.stars <= resource.data.stars + 7      // one submission adds at most 5 + 1 daily bonus
+          && request.resource.data.spent >= resource.data.spent;         // spent gems cannot be refunded
+        allow delete: if isTeacherOf(cid);
+      }
+
+      // Private drafts: only the pupil (and their teacher) can read them.
+      match /work/{wid} {
+        allow read: if signedIn() && (resource.data.uid == request.auth.uid || isTeacherOf(cid));
+        allow create, update: if signedIn() && isMemberOf(cid)
+          && request.resource.data.uid == request.auth.uid
+          && wid == request.auth.uid + "__" + request.resource.data.qid;
+        allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+      }
+
+      // Submissions: private until the teacher approves them for the Enchanted Library.
+      match /subs/{sid} {
+        allow read: if signedIn() && (resource.data.uid == request.auth.uid
+          || isTeacherOf(cid)
+          || isAdmin()   // the Developer Office only asks for COUNTS, never the writing itself
+          || (resource.data.status == "approved" && isMemberOf(cid)));
+        allow create: if classOpen(cid) && signedIn() && isMemberOf(cid)
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.status == "submitted"
+          && !("review" in request.resource.data)
+          && okText(request.resource.data.text, 6000);
+        allow update: if
+          // teacher: review, correct (as a separate copy inside review), approve or return — never change the pupil's own words or earlier versions
+          (isTeacherOf(cid)
+            && request.resource.data.uid == resource.data.uid
+            && request.resource.data.text == resource.data.text
+            && request.resource.data.get("versions", []) == resource.data.get("versions", [])
+            && request.resource.data.status in ["submitted", "returned", "approved", "reviewed"])
+          ||
+          // pupil: resubmit a piece the teacher returned for revision; the previous version is kept in versions[]
+          (signedIn() && resource.data.uid == request.auth.uid
+            && resource.data.status == "returned"
+            && request.resource.data.status == "submitted"
+            && request.resource.data.uid == resource.data.uid
+            && request.resource.data.get("review", null) == resource.data.get("review", null)
+            && request.resource.data.get("versions", []).size() == resource.data.get("versions", []).size() + 1
+            && okText(request.resource.data.text, 6000));
+        allow delete: if isTeacherOf(cid);
+      }
+
+      match /quests/{qid} {
+        allow read: if isTeacherOf(cid) || isMemberOf(cid);
+        allow write: if isTeacherOf(cid);
+      }
+      match /assign/{aid} {
+        allow read: if isTeacherOf(cid) || isMemberOf(cid);
+        allow write: if isTeacherOf(cid);
+      }
+      match /vocab/{qid} {
+        allow read: if isTeacherOf(cid) || isMemberOf(cid);
+        allow write: if isTeacherOf(cid);
+      }
+      match /feedback/{fid} {
+        allow create: if isMemberOf(cid) && request.resource.data.uid == request.auth.uid;
+        allow read: if isTeacherOf(cid);
+      }
+    }
+  }
+}

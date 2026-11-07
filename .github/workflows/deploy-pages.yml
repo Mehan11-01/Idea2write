@@ -1,0 +1,38 @@
+name: Publish Idea2Write to GitHub Pages
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Retrieve and verify website images
+        id: images
+        run: python3 scripts/materialize-pages-assets.py
+      - name: Store website images in this repository
+        if: steps.images.outputs.changed == 'true'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add firebase-academy/public/assets
+          git commit -m 'Add verified Idea2Write website images'
+          git push origin HEAD:main
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: firebase-academy/public
+      - name: Deploy website
+        id: deployment
+        uses: actions/deploy-pages@v4

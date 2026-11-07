@@ -1,0 +1,25 @@
+/* Parchment copy is dark; the surrounding enchanted panels use light copy. */
+.vdetail.parch p,.vdetail.parch h2,.vdetail.parch small{color:#342315!important;opacity:1!important}
+.vpic .pic{position:relative;display:block;width:100%;height:112px;overflow:hidden;border-radius:8px;background:#302c23}
+.vpic .pic img{display:block;width:100%;height:100%;object-fit:cover}
+.context-picture{position:absolute;bottom:0;left:0;right:0;background:#111b28e8;color:#fff!important;font:11px/1.5 sans-serif;text-align:center}
+.thinkwrap .parchpanel,.thinkwrap .parchpanel h3,.thinkwrap .parchpanel .label,.thinkwrap .parchpanel .mute,.thinkwrap .parchpanel .anslist,.thinkwrap .parchpanel .anslist span{color:#fff5e5!important;opacity:1}
+.thinkwrap .parchpanel input{color:#342315!important;background:#f2e3c4}
+.activity-support{margin:16px 0;padding:16px;border:1px solid #a68a4b;border-radius:12px;background:#121f31;color:#fff2d5;display:grid;gap:10px}
+.activity-support>span{color:#eee6d6}.activity-support .chip[aria-pressed=true]{background:#d0b16b;color:#211c14;border-color:#f4dc99}
+.question-choice{margin:0 0 18px;color:#fff3dc}.question-choice p{color:inherit!important}.question-choice .chip{margin:4px}
+.sentence-frame{color:#49341f!important;font-size:.9rem;margin:8px 0}.own-sections label{display:grid;gap:6px;margin:10px 0}
+.writing-topic{display:block;width:100%;max-height:160px;object-fit:contain;border-radius:6px}.writing-goal p{font-size:.9rem}
+.writing-vocabulary{display:flex;flex-wrap:wrap;gap:8px}.writing-word{width:100%;border:1px solid #aa8c52;border-radius:8px;overflow:hidden}.writing-word summary{display:flex;align-items:center;gap:10px;cursor:pointer;padding:7px;color:#fff1cf;background:#182b3c}.writing-word summary img{width:58px;height:44px;object-fit:cover;border-radius:4px}.writing-word summary .context-picture{position:static;font-size:10px;max-width:45px}.writing-word>div{padding:10px;background:#f3e6ca;color:#342315}.writing-word p{color:#342315!important;opacity:1!important}.writing-word .chip{background:#23384a;color:white}.writing-vocabulary+.chips{margin-top:8px}.help .hblock>p{font-size:.88rem}
+@media(max-width:620px){.vpic .pic{height:85px}.activity-support{padding:12px}.activity-support .chips{gap:6px}.writing-topic{max-height:140px}}
+.thinkwrap .tabnext>span,.scaf .mapmini summary{color:#fff1d4!important;opacity:1}
+.thinkwrap .charm,.thinkwrap .charm span,.thinkwrap .charm b{color:#fff2d4!important}
+
+.profile .review,.profile .review b,.profile .review p,.review,.review>b,.review>p{color:#fff!important;opacity:1}
+
+.support-wings .tabbody>.parchpanel:first-child{display:none}
+.question-choice h3{color:#fff!important;opacity:1}
+
+.game-vocab-photo{position:relative;display:block;flex:0 0 70px;width:70px;height:56px;overflow:hidden;border-radius:6px}.game-vocab-photo img{width:100%;height:100%;object-fit:cover}.game-vocab-photo .context-picture{font-size:9px}
+
+.vpic .pic .vocab-photo-tile{display:block;width:100%;height:100%}.writing-word summary .vocab-photo-tile{width:58px;height:44px;flex-shrink:0;border-radius:4px}.game-vocab-photo .vocab-photo-tile{width:100%;height:100%}

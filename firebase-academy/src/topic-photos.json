@@ -1,0 +1,38 @@
+{
+  "picnic": {
+    "src": "assets/topics/picnic.jpg",
+    "alt": "Outdoor picnic on a blanket in the park"
+  },
+  "pancakes": {
+    "src": "assets/topics/pancakes.jpg",
+    "alt": "Golden pancakes with fruit and syrup"
+  },
+  "doctor": {
+    "src": "assets/topics/doctor.jpg",
+    "alt": "A doctor\u2019s stethoscope"
+  },
+  "camping": {
+    "src": "assets/topics/camping.jpg",
+    "alt": "A tent beside a forest stream"
+  },
+  "funfair": {
+    "src": "assets/topics/funfair.jpg",
+    "alt": "A colourful Ferris wheel at a funfair"
+  },
+  "birthday": {
+    "src": "assets/topics/birthday.jpg",
+    "alt": "A birthday cake with glowing candles"
+  },
+  "museum": {
+    "src": "assets/topics/museum.jpg",
+    "alt": "A dinosaur skeleton in a museum hall"
+  },
+  "robot": {
+    "src": "assets/topics/robot.jpg",
+    "alt": "A friendly white robot"
+  },
+  "cat": {
+    "src": "assets/topics/cat.jpg",
+    "alt": "An orange tabby cat in the grass"
+  }
+}

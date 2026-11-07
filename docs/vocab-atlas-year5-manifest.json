@@ -1,0 +1,134 @@
+[
+  {
+    "id": "y5-me",
+    "src": "assets/vocabulary-atlases/y5-me.webp",
+    "width": 1086,
+    "height": 1448,
+    "columns": 3,
+    "rows": 4,
+    "source": "/workspace/scratch/14ebff8bbc1d/generated_images/exec-8509d485-56fe-49da-8d57-7ccc8514afb3.png",
+    "bytes": 339516,
+    "visually_checked": true
+  },
+  {
+    "id": "y5-camp",
+    "src": "assets/vocabulary-atlases/y5-camp.webp",
+    "width": 1086,
+    "height": 1448,
+    "columns": 3,
+    "rows": 4,
+    "source": "/workspace/scratch/14ebff8bbc1d/generated_images/exec-dd6680e3-aab9-423f-9db6-76ee59fcd403.png",
+    "bytes": 421990,
+    "visually_checked": true
+  },
+  {
+    "id": "y5-advice",
+    "src": "assets/vocabulary-atlases/y5-advice.webp",
+    "width": 1086,
+    "height": 1448,
+    "columns": 3,
+    "rows": 4,
+    "source": "/workspace/scratch/14ebff8bbc1d/generated_images/exec-cf76cd6a-744b-4455-8f61-932c0559bd16.png",
+    "bytes": 299160,
+    "visually_checked": true
+  },
+  {
+    "id": "y5-town",
+    "src": "assets/vocabulary-atlases/y5-town.webp",
+    "width": 1086,
+    "height": 1448,
+    "columns": 3,
+    "rows": 4,
+    "source": "/workspace/scratch/14ebff8bbc1d/generated_images/exec-d7cdbc99-204b-4107-a93a-cc7036967ef5.png",
+    "bytes": 503272,
+    "visually_checked": true
+  },
+  {
+    "id": "y5-cook",
+    "src": "assets/vocabulary-atlases/y5-cook.webp",
+    "width": 1086,
+    "height": 1448,
+    "columns": 3,
+    "rows": 4,
+    "source": "/workspace/scratch/14ebff8bbc1d/generated_images/exec-9d2af8c5-2a77-47fc-b314-4ddcf7f3c757.png",
+    "bytes": 274602,
+    "visually_checked": true
+  },
+  {
+    "id": "y5-space",
+    "src": "assets/vocabulary-atlases/y5-space.webp",
+    "width": 1086,
+    "height": 1448,
+    "columns": 3,
+    "rows": 4,
+    "source": "/workspace/scratch/14ebff8bbc1d/generated_images/exec-48d151a9-fff5-4fe4-9780-aa7e02c0ae5d.png",
+    "bytes": 288694,
+    "visually_checked": true
+  },
+  {
+    "id": "legacy-y5-about-me",
+    "src": "assets/vocabulary-atlases/legacy-y5-about-me.webp",
+    "width": 1086,
+    "height": 1448,
+    "columns": 3,
+    "rows": 4,
+    "source": "/workspace/scratch/14ebff8bbc1d/generated_images/exec-6f3e9d84-f698-4738-a825-c6401fe4fa3d.png",
+    "bytes": 309568,
+    "visually_checked": true
+  },
+  {
+    "id": "legacy-y5-place-i-love",
+    "src": "assets/vocabulary-atlases/legacy-y5-place-i-love.webp",
+    "width": 1086,
+    "height": 1448,
+    "columns": 3,
+    "rows": 4,
+    "source": "/workspace/scratch/14ebff8bbc1d/generated_images/exec-4a0ac4aa-1ae4-4373-916f-f1e4c3732b4b.png",
+    "bytes": 428842,
+    "visually_checked": true
+  },
+  {
+    "id": "legacy-y5-memorable-day",
+    "src": "assets/vocabulary-atlases/legacy-y5-memorable-day.webp",
+    "width": 1086,
+    "height": 1448,
+    "columns": 3,
+    "rows": 4,
+    "source": "/workspace/scratch/14ebff8bbc1d/generated_images/exec-ead12c48-8aa2-4310-aa62-cb1f1a9df729.png",
+    "bytes": 405852,
+    "visually_checked": true
+  },
+  {
+    "id": "legacy-y5-helpful-advice",
+    "src": "assets/vocabulary-atlases/legacy-y5-helpful-advice.webp",
+    "width": 1086,
+    "height": 1448,
+    "columns": 3,
+    "rows": 4,
+    "source": "/workspace/scratch/14ebff8bbc1d/generated_images/exec-73ba97b3-2ac9-4b4b-8b1c-84b586747b88.png",
+    "bytes": 251912,
+    "visually_checked": true
+  },
+  {
+    "id": "legacy-y5-meaningful-object",
+    "src": "assets/vocabulary-atlases/legacy-y5-meaningful-object.webp",
+    "width": 1086,
+    "height": 1448,
+    "columns": 3,
+    "rows": 4,
+    "source": "/workspace/scratch/14ebff8bbc1d/generated_images/exec-b975bf4a-b466-4f45-ac4c-c80ab09a0a0f.png",
+    "bytes": 472760,
+    "visually_checked": true
+  },
+  {
+    "id": "legacy-y5-special-person",
+    "src": "assets/vocabulary-atlases/legacy-y5-special-person.webp",
+    "width": 1086,
+    "height": 1448,
+    "columns": 3,
+    "rows": 4,
+    "source": "/workspace/scratch/14ebff8bbc1d/generated_images/exec-cf786de1-ba9e-4ae9-b5d0-97561cab3d29.png",
+    "bytes": 350580,
+    "visually_checked": true
+  }
+]

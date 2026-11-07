@@ -1,0 +1,25 @@
+{
+  "name": "idea2write-academy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Idea2Write: Academy of Quills — Think, Organise, Write for Malaysian Year 4–6 ESL pupils",
+  "scripts": {
+    "build": "sh build.sh",
+    "test:firebase": "esbuild src/data.js --bundle --platform=node --format=cjs --outfile=test/data.bundle.cjs --log-level=warning && firebase emulators:exec --project demo-idea2write --only firestore,auth 'node test/security.test.cjs && node test/api.test.cjs'",
+    "test:functions": "node test/functions.test.cjs",
+    "test:lifecycle": "node test/lifecycle.test.cjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.102.0",
+    "firebase": "^12.0.0"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
+    "esbuild": "^0.25.0",
+    "firebase-tools": "^15.35.0",
+    "htm": "3.1.1",
+    "jsdom": "^31.0.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  }
+}

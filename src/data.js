@@ -1,0 +1,336 @@
+/* ===== Idea2Write activity content (structured data, separate from UI) ===== */
+const YEARS = [
+  { id: 4, label: "Year 4", desc: "Build a clear paragraph.", goalText: "1 paragraph", minPara: 1, maxPara: 1, book: "#F6D2BF" },
+  { id: 5, label: "Year 5", desc: "Develop your ideas in one or two paragraphs.", goalText: "1 or 2 paragraphs", minPara: 1, maxPara: 2, book: "#CFE3D4" },
+  { id: 6, label: "Year 6", desc: "Connect your ideas in two or more paragraphs.", goalText: "2 or more paragraphs", minPara: 2, maxPara: 6, book: "#F4E3A8" }
+];
+
+const LEVELS = [
+  { id: "easy", name: "Guide me", sub: "More guidance",
+    gets: ["Picture prompt", "Word bank with meanings", "Guiding questions", "Sentence starters", "Labelled planner", "Clear checklist"],
+    expect: "Write clear sentences that follow your plan." },
+  { id: "medium", name: "A little help", sub: "Some guidance",
+    gets: ["Picture prompt", "Smaller word bank", "A few guiding questions", "Planner with headings", "Linking words", "Checklist"],
+    expect: "Add details and connect your sentences with linking words." },
+  { id: "hard", name: "On my own", sub: "Independent writing",
+    gets: ["Picture prompt", "A clear writing goal", "Open planner", "Challenge ideas", "Hints when you ask", "Checklist for clarity, organisation, detail and language"],
+    expect: "Add rich details, vary your sentences and connect your ideas smoothly." }
+];
+
+const SUPPORT_STD = ["4.2.5", "4.3.1", "4.3.2", "4.3.3"];
+const STD_NOTES = {
+  "4.2.1": "Giving information (about yourself, others or things you like)",
+  "4.2.2": "Writing for a purpose such as inviting, advising or planning",
+  "4.2.3": "Writing about events in order (recounts and stories)",
+  "4.2.4": "Describing people, places, objects and animals",
+  "4.2.5": "Connecting sentences and organising paragraphs",
+  "4.3.1": "Using punctuation appropriately",
+  "4.3.2": "Spelling written work",
+  "4.3.3": "Planning, drafting and revising in response to feedback"
+};
+
+/* Open organiser for Hard (pupil can rename and add sections) */
+const HARD_SECTIONS = {
+  4: [["h1", "Beginning", "How will you start your paragraph?", 1], ["h2", "Middle", "Your main ideas and details", 1], ["h3", "End", "How will you finish?", 1]],
+  5: [["h1", "Paragraph 1", "Main idea of this paragraph", 1], ["h2", "Paragraph 2", "Main idea of this paragraph", 2]],
+  6: [["h1", "Paragraph 1", "Main idea of this paragraph", 1], ["h2", "Paragraph 2", "Main idea of this paragraph", 2], ["h3", "Paragraph 3", "Main idea of this paragraph", 3]]
+};
+
+const TOPICS = [
+  /* ---------------- YEAR 4 ---------------- */
+  { id: "y4-daily-routine", year: 4, title: "My Daily Routine", purpose: "Description in time order", kind: "routine", std: ["4.2.3"],
+    preview: "Tell a reader what you do on a normal school day, from morning to night.",
+    task: "Write one paragraph describing a normal school day in time order.",
+    goal: "A reader can follow your day from the morning to the evening.",
+    scene: "routine",
+    alt: "A pupil in a white school shirt and blue trousers carries a school bag. A yellow school bus waits nearby and a clock shows seven o'clock. The sun is rising.",
+    questions: ["What time do you wake up?", "What do you do before you go to school?", "How do you go to school?", "What do you do at school?", "What do you do in the afternoon?", "What do you do in the evening before bed?"],
+    vocab: [["wake up", "stop sleeping"], ["brush", "clean with a brush, like your teeth"], ["breakfast", "the first meal of the day"], ["uniform", "the special clothes you wear to school"], ["recess", "a short break at school"], ["lesson", "a time when the teacher teaches a subject"], ["canteen", "the place at school where you buy food"], ["homework", "school work you do at home"], ["bathe", "wash your body"], ["bedtime", "the time you go to sleep"]],
+    starters: ["Every morning, I wake up at…", "After that, I…", "I go to school by…", "At school, I…", "In the afternoon, I…", "Finally, I go to bed at…"],
+    sections: [["morning", "Morning", "Waking up, getting ready and going to school", 1], ["afternoon", "Afternoon", "School, recess, going home and lunch", 1], ["evening", "Evening", "Homework, dinner and bedtime", 1]],
+    linking: ["First,", "Then,", "After that,", "Next,", "Later,", "Finally,"],
+    checks: ["My activities are in time order.", "I used time words, such as first and after that."],
+    challenges: ["Add one sentence about how you feel at one part of your day.", "Use a time phrase, such as 'at seven o'clock', at least twice."] },
+
+  { id: "y4-someone-special", year: 4, title: "Someone Special", purpose: "Description of a person", kind: "description", std: ["4.2.4"],
+    preview: "Describe a person you know and what makes them special to you.",
+    task: "Write one paragraph describing a person you know, including suitable details about that person.",
+    goal: "A reader can picture the person and understand why they are special to you.",
+    scene: "someone",
+    alt: "A grandmother wearing a lilac tudung and glasses stands in a garden beside her grandchild. They are smiling under a tree with flowers around them.",
+    questions: ["Who is this person?", "How do you know this person?", "What does this person look like?", "What does this person like to do?", "What do you do together?", "Why is this person special to you?"],
+    vocab: [["kind", "nice and caring to others"], ["cheerful", "happy and smiling"], ["helpful", "likes to help other people"], ["patient", "calm when waiting or teaching"], ["curly", "hair that has curls"], ["spectacles", "glasses to help you see"], ["gentle", "soft and careful"], ["hardworking", "works with a lot of effort"], ["caring", "looks after other people"], ["neighbour", "a person who lives near you"]],
+    starters: ["The person I want to write about is…", "He / She is my…", "He / She has…", "He / She likes to…", "Every weekend, we…", "He / She is special because…"],
+    sections: [["who", "Who is this person?", "Name or relationship, and how you know them", 1], ["details", "Looks and actions", "What they look like and what they do", 1], ["special", "Why they are special", "Your reason and a closing sentence", 1]],
+    linking: ["and", "also", "but", "because", "so", "Every weekend,"],
+    checks: ["I described how the person looks.", "I said why the person is special."],
+    challenges: ["Use two describing words together, for example 'long, black hair'.", "Add one example of something kind the person did."] },
+
+  { id: "y4-favourite-object", year: 4, title: "My Favourite Object", purpose: "Description of an object", kind: "description", std: ["4.2.4"],
+    preview: "Describe something you love using and explain how you use it.",
+    task: "Write one paragraph describing a favourite object and how you use it.",
+    goal: "A reader knows what your object looks like and how you use it.",
+    scene: "object",
+    alt: "A wooden desk with a blue pencil case, a row of colour pencils, an open exercise book and a green water bottle.",
+    questions: ["What is your favourite object?", "What colour is it?", "How big or small is it?", "What special parts does it have?", "How do you use it?", "Where did you get it?"],
+    vocab: [["pencil case", "a small bag or box to keep pencils"], ["zip", "a fastener that opens and closes a bag"], ["pocket", "a small space to keep things"], ["rectangular", "shaped like a long box"], ["smooth", "flat and soft to touch, not rough"], ["light", "not heavy"], ["useful", "helps you do something"], ["gift", "something given to you, a present"], ["colourful", "having many bright colours"], ["shiny", "bright and reflects light"]],
+    starters: ["My favourite object is…", "It is… in colour.", "It is as big as…", "It has…", "I use it to…", "I like it because…"],
+    sections: [["name", "Name of the object", "What it is and where you got it", 1], ["looks", "Colour, size and features", "What it looks like and its special parts", 1], ["use", "How I use it", "When and how you use it, and why you like it", 1]],
+    linking: ["and", "also", "because", "so", "When I…,", "Besides that,"],
+    checks: ["I named the object and described its colour and size.", "I explained how I use it."],
+    challenges: ["Compare its size with something else: 'It is as big as…'.", "Use 'because' to give a reason why you like it."] },
+
+  { id: "y4-celebration", year: 4, title: "Come to My Celebration", purpose: "Invitation", kind: "invitation", std: ["4.2.2"],
+    preview: "Invite a friend to a celebration and tell them everything they need to know.",
+    task: "Write a short invitation paragraph to a friend.",
+    goal: "Your friend knows what the celebration is, when and where it is, and how to reply.",
+    scene: "celebration",
+    alt: "Two friends stand beside a table with a birthday cake, a wrapped gift and a plate of kuih. Colourful bunting hangs above them.",
+    questions: ["What are you celebrating?", "On which day is it?", "What time does it start?", "Where will it be?", "What will you do or eat there?", "How should your friend reply?"],
+    vocab: [["invite", "ask someone to come"], ["celebration", "a happy, special event"], ["open house", "a home where guests are welcome during a festival"], ["guest", "a person who is invited"], ["address", "where a place is"], ["join", "come and take part"], ["reply", "answer"], ["delicious", "tastes very good"], ["games", "fun activities to play"], ["kuih", "small Malaysian cakes and snacks"]],
+    starters: ["Dear…,", "I would like to invite you to…", "It will be on… at…", "The celebration will be at…", "We will…", "Please let me know if…"],
+    sections: [["occasion", "Occasion", "What you are celebrating", 1], ["details", "Details", "Day, time, place and activities", 1], ["reply", "Invitation and reply", "Ask your friend to come and to reply", 1]],
+    linking: ["and", "also", "so", "after that", "then", "please"],
+    checks: ["I included the occasion, day, time and place.", "I asked my friend to reply."],
+    challenges: ["Tell your friend one thing to bring or wear.", "Add a friendly closing, such as 'See you there!'."] },
+
+  { id: "y4-favourite-activity", year: 4, title: "My Favourite Activity", purpose: "Giving information and reasons", kind: "info", std: ["4.2.1"],
+    preview: "Tell a reader about an activity you enjoy and why you like it.",
+    task: "Write one paragraph explaining which activity you enjoy and give simple reasons.",
+    goal: "A reader knows your activity, when and where you do it, and your reasons.",
+    scene: "activity",
+    alt: "Two children play badminton across a net on a school field. One wears a tudung and holds a racket; a shuttlecock flies between them.",
+    questions: ["What activity do you enjoy?", "When do you do it?", "Where do you do it?", "Who do you do it with?", "What do you need for it?", "Why do you enjoy it?"],
+    vocab: [["badminton", "a game with rackets and a shuttlecock"], ["racket", "a bat with strings"], ["field", "a big open area of grass"], ["practise", "do again and again to get better"], ["weekend", "Saturday and Sunday"], ["exciting", "makes you feel happy and full of energy"], ["healthy", "good for your body"], ["team", "a group that plays or works together"], ["hobby", "something you enjoy doing in free time"], ["enjoy", "like doing something"]],
+    starters: ["My favourite activity is…", "I usually do it on…", "I do it at… with…", "I need…", "I enjoy it because…", "It makes me feel…"],
+    sections: [["activity", "The activity", "Name the activity you enjoy", 1], ["details", "When, where and who with", "Details about how you do it", 1], ["reasons", "My reasons", "Why you enjoy it", 1]],
+    linking: ["and", "because", "so", "also", "Besides that,", "That is why"],
+    checks: ["I gave at least two reasons.", "I said when and where I do it."],
+    challenges: ["Use both 'because' and 'so' in your reasons.", "Tell your reader why they might enjoy it too."] },
+
+  { id: "y4-animal", year: 4, title: "An Animal I Like", purpose: "Description and reasons", kind: "description", std: ["4.2.4", "4.2.1"],
+    preview: "Describe an animal: how it looks, moves and eats, and why you like it.",
+    task: "Write one paragraph describing an animal and explain why you like it.",
+    goal: "A reader can picture the animal and knows why you like it.",
+    scene: "animal",
+    alt: "An orange cat with stripes sits on the grass beside a child who is kneeling to stroke it. A tree and a bowl of cat food are nearby.",
+    questions: ["Which animal do you like?", "What does it look like?", "How does it move?", "What does it eat?", "What is interesting about it?", "Why do you like it?"],
+    vocab: [["fur", "soft hair on an animal"], ["feathers", "the soft covering on a bird"], ["scales", "small hard plates on fish and reptiles"], ["paws", "the feet of a cat or dog"], ["tail", "the part at the back of an animal"], ["crawl", "move slowly close to the ground"], ["hop", "jump on small steps"], ["playful", "likes to play"], ["gentle", "soft and calm"], ["stripes", "long lines of colour"]],
+    starters: ["The animal I like is…", "It has…", "It moves by…", "It eats…", "An interesting thing about it is…", "I like it because…"],
+    sections: [["animal", "The animal", "Name the animal", 1], ["details", "Looks, movement and food", "How it looks, moves and what it eats", 1], ["why", "Interesting fact and why I like it", "Something interesting and your reason", 1]],
+    linking: ["and", "also", "but", "because", "so", "Besides that,"],
+    checks: ["I described how the animal looks, moves and eats.", "I explained why I like it."],
+    challenges: ["Add an interesting fact you know about the animal.", "Use a comparison: 'Its fur is as soft as…'."] },
+
+  /* ---------------- YEAR 5 ---------------- */
+  { id: "y5-about-me", year: 5, title: "About Me", purpose: "Giving detailed information", kind: "info", std: ["4.2.1"],
+    preview: "Share detailed information about your interests, strengths and preferences.",
+    task: "Write one or two paragraphs giving detailed information about yourself.",
+    goal: "A reader learns about your interests, strengths and preferences, with details and reasons.",
+    scene: "aboutme",
+    alt: "A smiling pupil stands with thought bubbles showing a football, a book and a musical note, which show different interests.",
+    questions: ["What do you like doing in your free time?", "What are you good at?", "What are your hobbies?", "Which food, colour or subject do you prefer, and why?", "What would you like to learn or do in the future?"],
+    vocab: [["interest", "something you like to learn about or do"], ["strength", "something you are good at"], ["hobby", "an activity you do for fun"], ["prefer", "like one thing more than another"], ["confident", "sure about yourself"], ["curious", "wanting to know more"], ["creative", "good at making new things or ideas"], ["talented", "has a natural skill"], ["favourite", "the one you like best"], ["ambition", "something you want to achieve"]],
+    starters: ["Let me tell you about myself.", "I am interested in…", "I am good at…", "In my free time, I…", "I prefer… to… because…", "In the future, I hope to…"],
+    sections: [["intro", "Introducing me", "A short opening about yourself (no full name needed)", 1], ["interests", "Interests and hobbies", "What you like doing and details about it", 1], ["strengths", "Strengths and preferences", "What you are good at and what you prefer", 2], ["ending", "Ending", "Your hopes or a closing thought", 2]],
+    linking: ["Besides that,", "In addition,", "For example,", "because", "However,", "In the future,"],
+    checks: ["I gave details, not just a list.", "I explained my preferences with reasons."],
+    challenges: ["Give an example that shows one of your strengths.", "Use 'prefer … to …' in one sentence."] },
+
+  { id: "y5-place-i-love", year: 5, title: "A Place I Love", purpose: "Description of a place", kind: "description", std: ["4.2.4"],
+    preview: "Describe a familiar place so clearly that a reader can imagine being there.",
+    task: "Write one or two paragraphs describing a familiar place.",
+    goal: "A reader can picture where the place is, what it looks like and what people do there.",
+    scene: "place",
+    alt: "A wooden kampung house on stilts stands among coconut trees beside green paddy fields under a blue sky.",
+    questions: ["What is the place?", "Where is it?", "What does it look like?", "What can you see and hear there?", "What can you do there?", "How do you feel when you are there?"],
+    vocab: [["kampung", "a village"], ["paddy field", "a field where rice grows"], ["peaceful", "quiet and calm"], ["breeze", "a light, cool wind"], ["located", "found in a certain place"], ["view", "what you can see from a place"], ["stall", "a small shop or table selling things"], ["crowded", "full of people"], ["fresh", "clean and cool, or newly made"], ["scenery", "the natural things you can see, like hills and trees"]],
+    starters: ["A place I love is…", "It is located…", "When you arrive, you can see…", "There are…", "At this place, I like to…", "I love this place because…"],
+    sections: [["where", "Where it is", "Name the place and where it is", 1], ["looks", "What it looks like", "Sights, sounds and other details", 1], ["do", "Things to see and do", "Activities at this place", 2], ["feel", "My feelings about it", "Why you love it", 2]],
+    linking: ["In addition,", "Besides that,", "next to", "in front of", "Whenever I…,", "That is why"],
+    checks: ["I described what the place looks like with clear details.", "I explained what people can do there."],
+    challenges: ["Use your senses: what can you hear or smell there?", "Use phrases of place, such as 'next to' or 'behind'."] },
+
+  { id: "y5-memorable-day", year: 5, title: "A Memorable Day", purpose: "Recount", kind: "recount", std: ["4.2.3"],
+    preview: "Recount a real day you remember well, in the order it happened.",
+    task: "Write a recount of a real experience in one or two paragraphs.",
+    goal: "A reader can follow what happened from beginning to end and knows how you felt.",
+    scene: "memorable",
+    alt: "A family day at the beach: two children build a sandcastle near the waves while the sun shines and a palm tree sways.",
+    questions: ["When did it happen?", "Where were you?", "Who was with you?", "What happened first?", "What happened next?", "How did you feel at the end?"],
+    vocab: [["memorable", "easy to remember because it was special"], ["journey", "a trip from one place to another"], ["arrived", "reached a place"], ["suddenly", "quickly and without warning"], ["afterwards", "later, after something"], ["excited", "very happy and eager"], ["nervous", "a little worried"], ["unforgettable", "you will always remember it"], ["exhausted", "very tired"], ["relieved", "happy that a worry is over"]],
+    starters: ["Last…, I…", "We went to…", "First, we…", "Then,…", "Suddenly,…", "At the end of the day, I felt…"],
+    sections: [["beginning", "Beginning", "When, where and who", 1], ["events", "Events", "What happened, in order", 1], ["ending", "Ending and feelings", "How the day ended and how you felt", 2]],
+    linking: ["First,", "Then,", "After that,", "Suddenly,", "Afterwards,", "At the end of the day,"],
+    checks: ["My events are in a clear order.", "I used past tense verbs, such as went and saw."],
+    challenges: ["Add one sentence about a feeling in the middle of the day.", "Use 'suddenly' or 'unfortunately' to make one event stand out."] },
+
+  { id: "y5-helpful-advice", year: 5, title: "Helpful Advice", purpose: "Advice reply", kind: "advice", std: ["4.2.2"],
+    preview: "Reply to a friend who finds it hard to organise homework, with useful advice.",
+    task: "Your friend Mei Ling writes: “I always forget my homework and my desk is messy. What should I do?” Write a reply giving her simple advice.",
+    goal: "Your friend understands what to do, why it will help, and feels encouraged.",
+    scene: "advice",
+    alt: "A worried pupil sits at a messy desk covered with books and loose papers, with a question mark above her head and a clock on the wall.",
+    questions: ["What is your friend's problem?", "What is one thing your friend can do?", "What else could help?", "Why will your advice help?", "How can you encourage your friend?"],
+    vocab: [["organise", "put things in order"], ["timetable", "a list showing what happens at each time"], ["planner", "a small book to write tasks in"], ["label", "a small tag with a name on it"], ["due date", "the day work must be handed in"], ["routine", "the same steps you do every day"], ["remind", "help someone remember"], ["tidy", "neat and in order"], ["advice", "ideas to help someone with a problem"], ["encourage", "give someone confidence"]],
+    starters: ["Dear Mei Ling,", "I am sorry to hear that…", "I think you should…", "You could also…", "This will help you because…", "Don't worry, I am sure…"],
+    sections: [["problem", "Problem", "Show you understand your friend's problem", 1], ["advice", "Advice", "What your friend can do", 1], ["reasons", "Reasons", "Why each idea will help", 2], ["encourage", "Encouragement", "A kind ending", 2]],
+    linking: ["First,", "Next,", "Also,", "This will help because", "Finally,", "Don't worry,"],
+    checks: ["My advice answers my friend's problem.", "I gave reasons for my advice.", "I wrote a friendly greeting and ending."],
+    challenges: ["Give your advice in steps, using first, next and finally.", "Use 'should' and 'could' to give advice politely."] },
+
+  { id: "y5-meaningful-object", year: 5, title: "My Favourite Object", purpose: "Description of an object", kind: "description", std: ["4.2.4"],
+    preview: "Describe a useful or meaningful object and explain why it matters to you.",
+    task: "Write one or two paragraphs describing a useful or meaningful object.",
+    goal: "A reader knows what your object looks like, how you use it and why it matters to you.",
+    scene: "wau",
+    alt: "A child holds the string of a colourful wau bulan kite flying high above a green field on a windy day.",
+    questions: ["What is the object?", "What does it look like?", "What special features does it have?", "How do you use it?", "Who gave it to you, or how did you get it?", "Why does it mean a lot to you?"],
+    vocab: [["meaningful", "important to you in a special way"], ["pattern", "shapes or colours that repeat"], ["material", "what something is made of"], ["wooden", "made of wood"], ["handmade", "made by hand, not by a machine"], ["precious", "very special and valuable to you"], ["feature", "a special part of something"], ["souvenir", "something you keep to remember a place"], ["treasure", "keep something because it is special"], ["durable", "lasts a long time"]],
+    starters: ["One object that is special to me is…", "It is made of…", "It has…", "I use it when…", "I got it from…", "It means a lot to me because…"],
+    sections: [["intro", "Introducing the object", "What it is and how you got it", 1], ["features", "Appearance and features", "Material, colours, patterns and parts", 1], ["use", "How I use it", "When and how you use it", 2], ["meaning", "Why it is meaningful", "Why it matters to you", 2]],
+    linking: ["In addition,", "Besides that,", "which", "whenever", "because", "That is why"],
+    checks: ["I described what the object is made of and its features.", "I explained why it is meaningful to me."],
+    challenges: ["Tell a short memory connected to the object.", "Use 'which' to join two ideas in one sentence."] },
+
+  { id: "y5-special-person", year: 5, title: "A Special Person", purpose: "Description of a person", kind: "description", std: ["4.2.4"],
+    preview: "Describe a person you know: who they are, their interests and what you do together.",
+    task: "Write one or two paragraphs describing a person you know.",
+    goal: "A reader knows who the person is, what they are like and what you share.",
+    scene: "person",
+    alt: "An uncle wearing a songkok and a child water plants together in a home garden. A watering can and flower pots are beside them.",
+    questions: ["Who is this person?", "How do you know them?", "What do they look like?", "What are their interests?", "What activities do you share?", "What have you learnt from them?"],
+    vocab: [["relative", "a person in your family"], ["neighbour", "a person who lives near you"], ["appearance", "how someone looks"], ["generous", "happy to give and share"], ["humorous", "funny, makes people laugh"], ["sporty", "likes sports"], ["share", "do or have something together"], ["wise", "knows a lot and gives good advice"], ["encourage", "help someone feel they can do it"], ["spend time", "be together doing something"]],
+    starters: ["A special person in my life is…", "I have known… since…", "He / She has…", "He / She is interested in…", "Together, we…", "From him / her, I have learnt…"],
+    sections: [["who", "Who they are", "Relationship and how you know them", 1], ["looks", "Appearance", "What they look like", 1], ["interests", "Interests", "What they enjoy", 2], ["shared", "Activities we share", "What you do together and what you learn", 2]],
+    linking: ["Besides that,", "In addition,", "Whenever we…,", "For example,", "not only… but also…", "That is why"],
+    checks: ["I described the person's appearance and interests.", "I wrote about activities we share."],
+    challenges: ["Include something the person often says, using speech marks.", "Use 'not only … but also …' in one sentence."] },
+
+  /* ---------------- YEAR 6 ---------------- */
+  { id: "y6-holiday-plans", year: 6, title: "My Holiday Plans", purpose: "Future plans", kind: "plans", std: ["4.2.2"],
+    preview: "Explain your plans for the school holidays: where, who with and what you will do.",
+    task: "Write at least two connected paragraphs describing future holiday plans.",
+    goal: "A reader clearly understands what you plan to do, with whom, and how you will prepare.",
+    scene: "holiday",
+    alt: "A pupil stands next to a packed suitcase and an open map, with green hills and tea plantations in the distance.",
+    questions: ["Where are you planning to go?", "Who will go with you?", "How will you travel there?", "What do you plan to do?", "How will you prepare?", "What are you looking forward to most?"],
+    vocab: [["destination", "the place you are going to"], ["itinerary", "a plan for each day of a trip"], ["accommodation", "a place to stay, like a hotel or homestay"], ["luggage", "bags you take on a trip"], ["pack", "put things into a bag"], ["book", "reserve a ticket or room early"], ["looking forward to", "excited about something that will happen"], ["explore", "visit and find out about a place"], ["scenic", "with beautiful views"], ["homestay", "staying with a family in their home"]],
+    starters: ["During the school holidays, I am going to…", "I will be travelling with…", "We plan to…", "Before the trip, I will…", "I am looking forward to…", "I hope that…"],
+    sections: [["overview", "Overview", "Where, when and who with", 1], ["activities", "Planned activities", "What you will do there", 2], ["prep", "Preparation and ending", "How you will get ready and what you hope for", 3]],
+    linking: ["First of all,", "In addition,", "After that,", "Besides that,", "Before we leave,", "Finally,"],
+    checks: ["My planned actions are clear (I used 'will' or 'going to').", "Each paragraph has a clear main idea."],
+    challenges: ["Explain a backup plan in case it rains.", "Use 'If …, we will …' in one sentence."] },
+
+  { id: "y6-adventure", year: 6, title: "An Unexpected Adventure", purpose: "Imagined story", kind: "story", std: ["4.2.3"],
+    preview: "Write an imagined story where something unexpected happens and is solved.",
+    task: "Write an imagined story in at least two connected paragraphs.",
+    goal: "A reader can follow your story from the setting, through the problem, to the resolution.",
+    scene: "adventure",
+    alt: "Two children with a torch stand at the entrance of a dark cave. The torch beam lights up the rocks and a map is in one child's hand.",
+    questions: ["Where and when does your story happen?", "Who are the characters?", "What unexpected problem happens?", "What do the characters do?", "How is the problem solved?", "How do the characters feel at the end?"],
+    vocab: [["unexpected", "not planned, a surprise"], ["mysterious", "strange and hard to explain"], ["path", "a narrow way to walk on"], ["torch", "a small light you carry"], ["echo", "a sound that bounces back"], ["trembling", "shaking because of fear or cold"], ["courage", "being brave"], ["rescue", "save someone from danger"], ["discover", "find something for the first time"], ["relieved", "happy that a worry is over"]],
+    starters: ["One rainy afternoon,…", "Without warning,…", "… had an idea.", "They decided to…", "Finally,…", "From that day on,…"],
+    sections: [["beginning", "Beginning", "Setting and characters: where, when and who", 1], ["middle", "Middle", "The unexpected problem and what the characters do", 2], ["ending", "Ending", "How the problem is solved and how they feel", 3]],
+    linking: ["One day,", "Suddenly,", "Meanwhile,", "Without warning,", "Soon,", "Eventually,", "In the end,"],
+    checks: ["My story has a problem and a resolution.", "The events happen in a clear order."],
+    challenges: ["Add a line of dialogue with speech marks.", "Show a feeling through an action, for example 'Her hands trembled'."] },
+
+  { id: "y6-person-admire", year: 6, title: "A Person I Admire", purpose: "Personality description", kind: "personality", std: ["4.2.4"],
+    preview: "Describe someone's personality and support each trait with examples of their actions.",
+    task: "Write at least two paragraphs describing someone's personality using examples of their actions.",
+    goal: "A reader understands the person's personality because you gave examples of what they do.",
+    scene: "admire",
+    alt: "A teacher in a blue tudung kindly helps a pupil at a whiteboard in a bright classroom.",
+    questions: ["Who is the person you admire?", "What is one of their personality traits?", "What did they do that shows this trait?", "What is another trait, and an example of it?", "How do they treat other people?", "Why do you admire them?"],
+    vocab: [["trait", "a quality in someone's personality"], ["responsible", "does what they should do"], ["determined", "does not give up"], ["honest", "tells the truth"], ["compassionate", "cares about other people's feelings"], ["dedicated", "gives a lot of time and effort"], ["humble", "does not show off"], ["generous", "likes to give and share"], ["inspire", "make others want to do well"], ["role model", "a person others want to be like"]],
+    starters: ["The person I admire most is…", "One of his / her best qualities is…", "For example,…", "Another trait that I admire is…", "This shows that…", "I hope to be like him / her because…"],
+    sections: [["who", "Who they are", "Introduce the person", 1], ["trait1", "Trait and example", "A trait plus an action that shows it", 2], ["trait2", "Another trait and example", "A second trait plus an action", 2], ["admire", "Why I admire them", "Your reflection", 3]],
+    linking: ["For example,", "For instance,", "This shows that", "Moreover,", "Although", "Above all,"],
+    checks: ["Each personality trait is supported by an example of an action.", "I explained why I admire this person."],
+    challenges: ["Use 'This shows that…' after each example.", "Use 'Although…' in one sentence."] },
+
+  { id: "y6-school-event", year: 6, title: "A Special School Event", purpose: "Factual recount", kind: "recount", std: ["4.2.3"],
+    preview: "Recount a real school event, from preparation to the highlights.",
+    task: "Write a factual recount of a school event in at least two paragraphs.",
+    goal: "A reader knows what happened, in order, and what you learnt from the event.",
+    scene: "event",
+    alt: "Pupils race on a school running track on Sports Day while classmates cheer under colourful flags.",
+    questions: ["What was the event?", "When and where was it held?", "How did your class prepare?", "What happened first, next and last?", "What was the highlight?", "What did you learn or feel?"],
+    vocab: [["event", "something special that is planned"], ["held", "took place"], ["rehearse", "practise before a performance"], ["ceremony", "a formal event, like an opening"], ["participate", "take part"], ["cheer", "shout to support someone"], ["highlight", "the best or most exciting part"], ["banner", "a long sign with words"], ["prize-giving", "a time when prizes are given"], ["teamwork", "working well together"]],
+    starters: ["On…, our school held…", "Before the event, we…", "The event began with…", "After that,…", "The highlight of the day was…", "Looking back, I learnt…"],
+    sections: [["event", "The event and preparation", "What, when, where and how you prepared", 1], ["sequence", "What happened", "Main events in order", 2], ["highlight", "Highlights", "The best moments", 2], ["reflection", "Reflection", "What you learnt or felt", 3]],
+    linking: ["Before the event,", "At first,", "After that,", "Later,", "Finally,", "Looking back,"],
+    checks: ["My events are in a clear order.", "I wrote facts about what really happened.", "I ended with a reflection."],
+    challenges: ["Include a time phrase for each main event.", "Add one sentence from another person's point of view, such as a teacher."] },
+
+  { id: "y6-getting-to-know-us", year: 6, title: "Getting to Know Us", purpose: "Giving detailed information", kind: "info", std: ["4.2.1"],
+    preview: "Give detailed information about yourself and someone you know, and compare you both.",
+    task: "Write at least two paragraphs giving detailed information about yourself and someone you know.",
+    goal: "A reader learns about both people, how you are similar and different, and what you share.",
+    scene: "getting",
+    alt: "Two friends sit side by side. Speech bubbles show their interests: one likes drawing and the other likes football.",
+    questions: ["What are your interests and strengths?", "Who is the other person and how do you know them?", "What are their interests and strengths?", "How are you similar?", "How are you different?", "What do you enjoy doing together?"],
+    vocab: [["similar", "almost the same"], ["different", "not the same"], ["both", "the two of them"], ["whereas", "but on the other hand"], ["in common", "shared by both people"], ["unlike", "different from"], ["personality", "what someone is like as a person"], ["skill", "something you can do well"], ["cooperate", "work together"], ["friendship", "being friends"]],
+    starters: ["I am a person who…", "My friend… is…", "We are similar because both of us…", "However, unlike me,…", "Whenever we are together, we…", "Our friendship is…"],
+    sections: [["me", "About me", "Your interests and strengths", 1], ["other", "About the other person", "Their interests and strengths", 2], ["compare", "Similar, different, shared", "Similarities, differences and activities together", 3]],
+    linking: ["Both of us", "Similarly,", "However,", "whereas", "unlike", "On the other hand,"],
+    checks: ["I gave detailed information about both people.", "I described at least one similarity and one difference."],
+    challenges: ["Use 'whereas' or 'unlike' to show a difference.", "Give an example of something you did together."] },
+
+  { id: "y6-class-project", year: 6, title: "Our Class Project", purpose: "Project plan", kind: "plans", std: ["4.2.2"],
+    preview: "Plan a class project, such as a reading corner or recycling activity.",
+    task: "Write at least two paragraphs describing plans for a class project, such as a reading corner or recycling activity.",
+    goal: "A reader knows what the project is, who will do what, the steps, and the result you hope for.",
+    scene: "project",
+    alt: "A classroom reading corner with a bookshelf and cushions, next to three recycling bins for paper, plastic and cans. Two pupils carry a box of books.",
+    questions: ["What is your class project?", "Why does your class want to do it?", "Who will do each job?", "What materials will you need?", "What are the steps?", "What do you hope will happen?"],
+    vocab: [["project", "a planned piece of work"], ["recycle", "use something again or make it into something new"], ["materials", "things you need to make something"], ["cardboard", "thick, stiff paper"], ["role", "a job someone does"], ["responsible for", "in charge of"], ["arrange", "put things in order"], ["collect", "gather things together"], ["decorate", "make something look nice"], ["benefit", "a good result"]],
+    starters: ["Our class is planning to…", "We want to do this because…", "… will be responsible for…", "We will need…", "First, we will… Then,…", "We hope that…"],
+    sections: [["overview", "The project and why", "What it is and why you chose it", 1], ["roles", "Roles and materials", "Who does what and what you need", 2], ["steps", "Planned steps", "The order of the work", 2], ["result", "Intended result", "What you hope will happen", 3]],
+    linking: ["First,", "Next,", "After that,", "so that", "Meanwhile,", "Finally,"],
+    checks: ["The planned actions and roles are clear.", "The steps are in a sensible order."],
+    challenges: ["Explain how you will check whether the project worked.", "Use 'so that' to show a purpose."] }
+];
+
+const TOPIC = Object.fromEntries(TOPICS.map(t => [t.id, t]));
+
+/* Activity-type specific review checks */
+const KIND_CHECKS = {
+  recount: "My events are in a clear order.",
+  invitation: "I included the occasion, time and place.",
+  advice: "My advice addresses my friend's problem.",
+  story: "The problem in my story has a resolution.",
+  plans: "My planned actions are clear.",
+  personality: "My personality traits are supported by examples.",
+  routine: "My day is described in time order.",
+  description: "My details help the reader picture what I describe.",
+  info: "I gave detailed information, with reasons or examples."
+};
+
+const GENERAL_CHECKS = [
+  ["g-task", "I answered the task."],
+  ["g-detail", "I included relevant details."],
+  ["g-organise", "I organised my ideas clearly."],
+  ["g-caps", "I checked capital letters and punctuation."],
+  ["g-spell", "I checked spelling."],
+  ["g-reread", "I reread and improved my work."]
+];
+const HARD_CHECKS = [
+  ["h-clarity", "Clarity: a reader can easily follow my writing."],
+  ["h-organise", "Organisation: each paragraph has a main idea, in a sensible order."],
+  ["h-detail", "Detail: I included specific, relevant details."],
+  ["h-language", "Language: I chose precise words and varied my sentences."],
+  ["g-caps", "I checked capital letters, punctuation and spelling."],
+  ["g-reread", "I reread and improved my work."]
+];
+
+function checklistFor(topic, level) {
+  /* topic checks already include the activity-type check (recount order, invitation details, advice, story resolution, plans, personality examples) */
+  const kind = [];
+  const own = topic.checks.map((c, i) => ["t-" + i, c]);
+  if (level === "hard") return [...HARD_CHECKS.slice(0, 4), ...kind, ...own, ...HARD_CHECKS.slice(4)];
+  const base = [...GENERAL_CHECKS.slice(0, 3), ...kind, ...own, ...GENERAL_CHECKS.slice(3)];
+  if (level === "medium") base.splice(base.length - 3, 0, ["m-link", "I used linking words to connect my ideas."]);
+  return base;
+}
