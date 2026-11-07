@@ -962,3 +962,15 @@ code.bigcode{display:inline-block;font-size:1.5rem;letter-spacing:.12em;backgrou
 .chip.ok{background:#2f8a5a;border-color:#2f8a5a;color:#fff}.chip.danger{background:#a8322a;border-color:#a8322a;color:#fff}
 .dstats{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
 .closedrow td{opacity:.7}
+
+/* Keep teacher feedback readable on parchment in every year and activity. */
+.corr.parchframe .review,
+.corr.parchframe .review b,
+.corr.parchframe .review p,
+.corr.parchframe .ctable.pairs th,
+.corr.parchframe .ctable.pairs td,
+.corr.parchframe .ctable.pairs td * {
+  color: #000 !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
