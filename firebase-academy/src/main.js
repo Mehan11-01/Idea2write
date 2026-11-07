@@ -205,7 +205,7 @@ Object.assign(A,{
       toast({keep:"Corrections saved.",returned:"Sent back to the pupil to improve.",approved:"Published in the Enchanted Library!",reviewed:b.dataset.lib?"Removed from the Library.":"Saved as checked. It is not in the Library."}[st])}catch(e){}},
   rmbookask:b=>{T.rmBook=b.dataset.id;render()},rmbookno:()=>{T.rmBook=null;render()},
   oranks:async()=>{const v=!S.t.cls.hideRanks;try{await busy("Saving…",()=>API.updateClass(S.t.cid,{hideRanks:v}));S.t.cls.hideRanks=v;render()}catch(e){}},
-  corrtab:b=>{T.corrTab=b.dataset.t;render()}
+  corrtab:b=>{T.corrTab=b.dataset.t;const panel=b.closest('.corr');if(!panel)return;const row=panel.closest('.log>details');const entries=[...document.querySelectorAll('#my-writing .log>details')];const entry=P()?.history.slice().reverse()[entries.indexOf(row)];const sub=entry&&S.subs.find(s=>s.id===entry.id);if(sub){const holder=document.createElement('div');holder.innerHTML=correctionsPanel(sub,true);panel.replaceChildren(...holder.firstElementChild.childNodes);panel.open=true;panel.querySelector('[data-act="corrtab"][data-t="'+T.corrTab+'"]')?.focus({preventScroll:true});return}const opened=[...document.querySelectorAll('#app details')].map(d=>d.open);const y=window.scrollY;render();document.querySelectorAll('#app details').forEach((d,i)=>d.open=opened[i]);window.scrollTo(0,y)}
 });
 document.addEventListener("input",e=>{const t=e.target;
   if(t.id==="rv-edit"){const s=rvSub(t.dataset.sid);if(!s)return;const d=rvDraft(s);d.corrected=t.value;d.dirty=true;clearTimeout(A._rvT);A._rvT=setTimeout(()=>rvRefreshDiff(s),250)}
