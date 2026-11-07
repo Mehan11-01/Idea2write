@@ -2082,9 +2082,11 @@ function sProfile(){
     <div class="panel"><h3>Collector’s items <span class="label">${(p.trophies||[]).length} of ${TROPHIES.length}</span></h3>
       <div class="chips" style="align-items:center">${(p.trophies||[]).length?(p.trophies||[]).map(id=>{const t=TROPHIES.find(x=>x.id===id);return t?`<span title="${esc(t.name)}">${trophyArt(t,52)}</span>`:""}).join(""):`<span class="mute">No items yet.</span>`}
       <button class="btn" data-act="go" data-s="vault" style="margin-left:auto">Open the Trophy Vault →</button></div></div>
-    <div class="panel" id="my-writing" tabindex="-1"><h3>My writing & teacher feedback</h3>${p.history.length?`<div class="log">${p.history.slice().reverse().map(x=>{return `<details><summary>${parse(x.date).toLocaleDateString("en-GB",{day:"numeric",month:"short"})} · ${esc(x.title||x.quest)} · ${Number.isFinite(+x.words)?+x.words:words(String(x.text||""))} words · <span class="stat-${x.status}">${{submitted:"Waiting for teacher",returned:"Please improve",approved:"In the Library",reviewed:"Checked by teacher"}[x.status]||""}</span><span class="stars">${[1,2,3,4,5].map(i=>starIcon(i<=x.stars,16)).join("")}</span></summary><p class="parch">${esc(x.text)}</p>${(()=>{const sub=S.subs.find(z=>z.id===x.id);return sub?correctionsPanel(sub,false)+versionHistory(sub)+(x.status==="returned"?`<button class="plaque ember small" data-act="revise" data-id="${sub.id}">Improve my writing →</button>`:""):""})()}</details>`}).join("")}</div>`:`<p class="mute">Your finished writing will be kept here.</p>`}</div>
+    <button class="plaque" data-act="mywriting">Open my writing & feedback →</button>
   </section>`;
 }
+
+function sFeedback(){const p=P();return `<section class="stage profile"><div class="headrow"><div><p class="kicker">My writing journey · Year ${p.year}</p><h1>My writing & feedback</h1><p>Read your writing, teacher’s corrections and feedback.</p></div><button class="btn ghost" data-act="go" data-s="hall">← Courtyard</button></div>    <div class="panel" id="my-writing" tabindex="-1"><h3>My writing & teacher feedback</h3>${p.history.length?`<div class="log">${p.history.slice().reverse().map(x=>{return `<details><summary>${parse(x.date).toLocaleDateString("en-GB",{day:"numeric",month:"short"})} · ${esc(x.title||x.quest)} · ${Number.isFinite(+x.words)?+x.words:words(String(x.text||""))} words · <span class="stat-${x.status}">${{submitted:"Waiting for teacher",returned:"Please improve",approved:"In the Library",reviewed:"Checked by teacher"}[x.status]||""}</span><span class="stars">${[1,2,3,4,5].map(i=>starIcon(i<=x.stars,16)).join("")}</span></summary><p class="parch">${esc(x.text)}</p>${(()=>{const sub=S.subs.find(z=>z.id===x.id);return sub?correctionsPanel(sub,false)+versionHistory(sub)+(x.status==="returned"?`<button class="plaque ember small" data-act="revise" data-id="${sub.id}">Improve my writing →</button>`:""):""})()}</details>`}).join("")}</div>`:`<p class="mute">Your finished writing will be kept here.</p>`}</div></section>`;}
 
 /* ---------- calendar ---------- */
 function sCalendar(){
@@ -2198,12 +2200,12 @@ function modalHTML(){
 }
 
 /* ================= render ================= */
-const SCREENS={classes:sClasses,help:sHelp,pending:sPending,dev:sDev,boot:()=>`<div class="libempty" style="min-height:60vh"><span class="spin big"></span><p>Opening the Academy…</p></div>`,setup:sSetup,auth:sAuth,tauth:sTAuth,year:sYear,library:sLibrary,fame:sFame,vault:sVault,title:sTitle,create:sCreate,house:sHouse,support:sSupport,hall:sHall,quest:sQuest,reward:sReward,profile:sProfile,calendar:sCalendar,office:sOffice};
+const SCREENS={classes:sClasses,help:sHelp,pending:sPending,dev:sDev,boot:()=>`<div class="libempty" style="min-height:60vh"><span class="spin big"></span><p>Opening the Academy…</p></div>`,setup:sSetup,auth:sAuth,tauth:sTAuth,year:sYear,library:sLibrary,fame:sFame,vault:sVault,title:sTitle,create:sCreate,house:sHouse,support:sSupport,hall:sHall,quest:sQuest,reward:sReward,profile:sProfile,feedback:sFeedback,calendar:sCalendar,office:sOffice};
 const NOHUD=new Set(["pending","boot","setup","title","auth","tauth","year","create","house","support"]);
 function render(){
   document.documentElement.dataset.motion=DB.motion?"on":"off";
   const p=S.role==="pupil"?P():null;if(p){const h=HOUSES[p.house];document.documentElement.style.setProperty("--hdark",h.dark);document.documentElement.style.setProperty("--hc",h.col)}
-  const rk=V.screen==="quest"&&W()?({think:"library",org:"chamber",write:"quill"}[W().step]):({hall:"courtyard",reward:"vault",vault:"vault",calendar:"observatory",profile:"quill",library:"library",fame:"vault",office:"library"}[V.screen]||null);
+  const rk=V.screen==="quest"&&W()?({think:"library",org:"chamber",write:"quill"}[W().step]):({hall:"courtyard",reward:"vault",vault:"vault",calendar:"observatory",profile:"quill",feedback:"quill",library:"library",fame:"vault",office:"library"}[V.screen]||null);
   setWorld(rk||"castle");document.body.dataset.screen=V.screen;$("#world").classList.toggle("dim",!["title","hall"].includes(V.screen)&&!rk);$("#world").classList.toggle("room",!!rk&&V.screen!=="hall");
   const fid=document.activeElement&&document.activeElement.id;
   $("#top").innerHTML=V.screen==="dev"?dHud():V.screen==="office"?oHud():NOHUD.has(V.screen)||!p?"":hud();
@@ -2218,7 +2220,7 @@ function render(){
   if(T.fx){T.fx=false;const c=document.querySelector("#chest .chest");setTimeout(()=>{c&&c.classList.add("open");sparkle()},DB.motion?350:0);sfx("complete",{delay:.3});const n=T.last?T.last.stars:0;for(let i=1;i<=n;i++)setTimeout(()=>sfx("star"),500+i*150+(DB.motion?150:0));if(T.last&&T.last.newT&&T.last.newT.length)setTimeout(()=>sfx("trophy"),1800)}
   else{const c=document.querySelector("#chest .chest");c&&c.classList.add("open")}
 }
-const PUPIL_SCREENS=["classes","hall","quest","reward","profile","calendar","vault","library","fame","year","create","house","support"];
+const PUPIL_SCREENS=["classes","hall","quest","reward","profile","feedback","calendar","vault","library","fame","year","create","house","support"];
 async function go(s){
   try{speechSynthesis.cancel()}catch(e){}
   if(PUPIL_SCREENS.includes(s)&&S.role!=="pupil")s="title";
@@ -2227,7 +2229,7 @@ async function go(s){
   if(s==="dev"&&!S.admin)s="title";
   if((s==="library"||s==="fame")&&S.role==="pupil"){try{await busy(s==="library"?"Opening the library…":"Counting the stars…",refreshClassmates)}catch(e){return}}
   if(["hall","profile","vault"].includes(s)&&P()){const nw=refreshTrophies(P());if(nw.length){save();setTimeout(()=>{const t=TROPHIES.find(x=>x.id===nw[0]);toast(`New badge: ${t.name}!`,trophyArt(t,30));sfx("trophy",{auto:true})},300)}}
-  if(["hall","profile","vault","calendar"].includes(s))refreshMine();
+  if(["hall","profile","feedback","vault","calendar"].includes(s))refreshMine();
   V.screen=s;T.enter=true;T.err="";T.editing=T.detailing=T.confirmDel=T.selCard=null;T.clearConfirm=false;
   if(S.role==="pupil"&&S.prof&&S.prof.setup)save();
   render();window.scrollTo({top:0,behavior:DB.motion?"smooth":"auto"});
@@ -2666,7 +2668,7 @@ Object.assign(A,{
       toast({keep:"Corrections saved.",returned:"Sent back to the pupil to improve.",approved:"Published in the Enchanted Library!",reviewed:b.dataset.lib?"Removed from the Library.":"Saved as checked. It is not in the Library."}[st])}catch(e){}},
   rmbookask:b=>{T.rmBook=b.dataset.id;render()},rmbookno:()=>{T.rmBook=null;render()},
   oranks:async()=>{const v=!S.t.cls.hideRanks;try{await busy("Saving…",()=>API.updateClass(S.t.cid,{hideRanks:v}));S.t.cls.hideRanks=v;render()}catch(e){}},
-  corrtab:b=>{T.corrTab=b.dataset.t;render()}
+  corrtab:b=>{T.corrTab=b.dataset.t;const panel=b.closest('.corr');if(!panel)return;const row=panel.closest('.log>details');const entries=[...document.querySelectorAll('#my-writing .log>details')];const entry=P()?.history.slice().reverse()[entries.indexOf(row)];const sub=entry&&S.subs.find(s=>s.id===entry.id);if(sub){const holder=document.createElement('div');holder.innerHTML=correctionsPanel(sub,true);panel.replaceChildren(...holder.firstElementChild.childNodes);panel.open=true;panel.querySelector('[data-act="corrtab"][data-t="'+T.corrTab+'"]')?.focus({preventScroll:true});return}const opened=[...document.querySelectorAll('#app details')].map(d=>d.open);const y=window.scrollY;render();document.querySelectorAll('#app details').forEach((d,i)=>d.open=opened[i]);window.scrollTo(0,y)}
 });
 document.addEventListener("input",e=>{const t=e.target;
   if(t.id==="rv-edit"){const s=rvSub(t.dataset.sid);if(!s)return;const d=rvDraft(s);d.corrected=t.value;d.dirty=true;clearTimeout(A._rvT);A._rvT=setTimeout(()=>rvRefreshDiff(s),250)}
@@ -2758,7 +2760,7 @@ A.signupstudent=async()=>{T.authTab='new';T.code=T.nick=T.loginIdentity='';T.err
 A.signupteacher=async()=>{T.authTab='new';T.err='';T.keep=false;await go('tauth')};
 A.studentlogin=async()=>{T.authTab='login';T.loginIdentity=T.code=T.nick='';T.err='';T.keep=false;T.qmanual=true;T.showQuick=false;await go('auth')};
 A.teacherlogin=()=>{T.authTab='login';T.err='';T.femail='';T.keep=false;go('tauth')};
-A.mywriting=async()=>{if(S.role!=='pupil'||!P())return;await refreshMine(true);await go('profile');const log=document.querySelector('#my-writing');if(log){const latest=log.querySelector('details');if(latest){latest.open=true;const feedback=latest.querySelector('.corr');if(feedback)feedback.open=true}requestAnimationFrame(()=>{log.scrollIntoView({behavior:DB.motion?'smooth':'instant',block:'start'});log.focus({preventScroll:true})})}};
+A.mywriting=async()=>{if(S.role!=='pupil'||!P())return;await refreshMine(true);await go('feedback');const log=document.querySelector('#my-writing');if(log){const latest=log.querySelector('details');if(latest){latest.open=true;const feedback=latest.querySelector('.corr');if(feedback)feedback.open=true}}};
 A.resetask=()=>{T.modal='testreset';render()};
 A.resettest=async()=>{if(!API.local||!window.I2W_TESTING)return;clearTimeout(saveT);await API.logout();await API.resetTesting();location.replace(location.pathname)};
 const lifecycleModal=modalHTML;modalHTML=()=>T.modal==='testreset'?`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="reset-title"><div class="box"><h2 id="reset-title">Start a clean test?</h2><p>This removes only the accounts, classes and writing created in this device-only testing workspace. Live Firebase and the earlier website are unaffected.</p><button class="plaque" data-act="resettest">Reset test data and sign out</button><button class="chip" id="closemodal" data-act="closemodal">Keep my test data</button></div></div>`:lifecycleModal();
